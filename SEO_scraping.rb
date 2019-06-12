@@ -3,60 +3,50 @@ require 'open-uri'
 require 'pry-rails'
 require 'pry-byebug'
 require 'google_drive'
+require 'pp'
 
 
- def index
+ def one
    # config.jsonを読み込んでセッションを確立
   session = GoogleDrive::Session.from_config("config.json")
 # スプレッドシートをURLで取得
   sp=session.spreadsheet_by_url("https://docs.google.com/spreadsheets/d/1WoF_bsosC2wVEZ0BGB_oYmi5ZbrUXy_w4uS2rI0l178/edit#gid=0")
 # "シート1"という名前のワークシートを取得
-  ws = sp.worksheet_by_title("シート1")
-   @main="https://www.google.com/search?q="
-   @search_query=ws["B3"]
-   @host=(@main+@search_query)
-   @url=URI.encode(@host)
-   @doc = Nokogiri::HTML(open(@url))
-   @title=@doc.at_css(".r")
-	 	 binding.pry
-   url.each do |host|
-     get_clinic(host)
-   end
+  ws = sp.worksheet_by_title("20")
+  @search_query=[]
+  @search_query << ws["D9"]
+  @search_query << ws["F9"]
+  @search_query << ws["H9"]
+  @search_query << ws["J9"]
+  t=4
+  hh_r=4
+  hhh_r=5
+  @search_query.each do |sq|
+    @host=(sq)
+    @url=URI.encode(@host)
+    @doc = Nokogiri::HTML(open(@url))
+    title=@doc.at_css("title").text
+    h2=@doc.css("h2")
+    h3=@doc.css("h3")
+	n=13
+	m=13
+    h2.each do |hh|
+	  h2=hh.text
+      ws[n,hh_r]=h2
+	  n=n+1
+    end
+    h3.each do |hhh|
+	  h3=hhh.text
+      ws[m,hhh_r]=h3
+	  m=m+1
+    end
+    ws[8,t]=title
+    ws.save
+	t=t+2
+	hh_r=hh_r+2
+	hhh_r=hhh_r+2
+  end
  end
 
-index
-  
-#url配列のひとつづつに対して一覧から病院ごとのページのリンクを取得して、links配列に突っ込む
-#links配列にeachをかけて欲しい情報を取ってくるためのget_infoメソッドに投げる
- def get_clinic(host)
-      @url=host
-      @doc = Nokogiri::HTML(open(@url))
-      link= @doc.css(".title-box").css("a")
-      
-      link.each do |li|
-        lin=li.attributes["href"].value
-        get_info(lin)
-      end
-      
- end
- 
-#病院詳細のページから欲しい情報を持ってくる
- def get_info(link)
-     information={}
-     @url='https://nicoly.jp'+ link
-     @doc = Nokogiri::HTML(open(@url))
-     name= @doc.css("tr").css("td").text.split("／")[0].split("\n")[0]
-     rate= @doc.at_css(".rating").text
-     area=@doc.css("tr").css("td").text.split("／")[0].split("\n")[2].split(" ")[0]
-     boss=@doc.at_css(".name").text
-     information[:name]=name
-     information[:rate]=rate
-     information[:area]=area
-     information[:boss]=boss
-     puts information
-     #診療科目も取りたい
- end
-
- links
- 
+one
  
