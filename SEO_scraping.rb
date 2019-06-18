@@ -3,16 +3,15 @@ require 'open-uri'
 require 'pry-rails'
 require 'pry-byebug'
 require 'google_drive'
-require 'pp'
 
 
  def one
    # config.jsonを読み込んでセッションを確立
   session = GoogleDrive::Session.from_config("config.json")
 # スプレッドシートをURLで取得
-  sp=session.spreadsheet_by_url("https://docs.google.com/spreadsheets/d/1WoF_bsosC2wVEZ0BGB_oYmi5ZbrUXy_w4uS2rI0l178/edit#gid=0")
-# "シート1"という名前のワークシートを取得
-  ws = sp.worksheet_by_title("20")
+  sp=session.spreadsheet_by_url("https://docs.google.com/spreadsheets/d/1SuTd7sJ8p46f1ptt8fnA-7lFJ2p1IYYErvE2kTTXQYc/edit#gid=0")
+# "シート21"という名前のワークシートを取得
+  ws = sp.worksheet_by_title("1")
   @search_query=[]
   @search_query << ws["D9"]
   @search_query << ws["F9"]
